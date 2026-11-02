@@ -428,13 +428,13 @@ spec:
       - build-image-index
       taskRef:
         params:
-        - name: name
-          value: fbc-fips-check-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-fbc-fips-check-oci-ta:0.1@sha256:935adb61a5c9be0f619edc8838771ad3fe08cf17689094aeaaeac493af2a2115
-        - name: kind
-          value: task
-        resolver: bundles
+        - name: url
+          value: https://github.com/ashwgit-dev/konflux-operator-tasks.git
+        - name: revision
+          value: binaryless-fips
+        - name: pathInRepo
+          value: task/fbc-fips-check-oci-ta/0.2/fbc-fips-check-oci-ta.yaml
+        resolver: git
       when:
       - input: $(params.skip-checks)
         operator: in
