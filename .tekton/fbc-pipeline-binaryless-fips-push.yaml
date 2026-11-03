@@ -416,7 +416,7 @@ spec:
         operator: in
         values:
         - "false"
-    - name: fbc-fips-check-oci-ta
+    - name: fbc-fips-prepare
       params:
       - name: image-digest
         value: $(tasks.build-image-index.results.IMAGE_DIGEST)
@@ -424,6 +424,10 @@ spec:
         value: $(tasks.build-image-index.results.IMAGE_URL)
       - name: SOURCE_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+      - name: ociStorage
+        value: $(params.output-image).fips-buckets
+      - name: NUM_BUCKETS
+        value: "2"
       runAfter:
       - build-image-index
       taskRef:
@@ -433,7 +437,37 @@ spec:
         - name: revision
           value: binaryless-fips
         - name: pathInRepo
-          value: task/fbc-fips-check-oci-ta/0.2/fbc-fips-check-oci-ta.yaml
+          value: task/fbc-fips-prepare-oci-ta/0.2/fbc-fips-prepare-oci-ta.yaml
+        resolver: git
+      when:
+      - input: $(params.skip-checks)
+        operator: in
+        values:
+        - "false"
+    - matrix:
+        params:
+        - name: OCP_VERSION
+          value:
+          - $(tasks.fbc-fips-prepare.results.OCP_VERSIONS[*])
+        - name: BUCKET_INDEX
+          value:
+          - $(tasks.fbc-fips-prepare.results.BUCKET_INDICES[*])
+      name: fbc-fips-check
+      params:
+      - name: BUCKETS_ARTIFACT
+        value: $(tasks.fbc-fips-prepare.results.BUCKETS_ARTIFACT)
+      - name: MAX_PARALLEL
+        value: "2"
+      runAfter:
+      - fbc-fips-prepare
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/ashwgit-dev/konflux-operator-tasks.git
+        - name: revision
+          value: binaryless-fips
+        - name: pathInRepo
+          value: task/fbc-fips-check-matrix-based-oci-ta/0.2/fbc-fips-check-matrix-based-oci-ta.yaml
         resolver: git
       when:
       - input: $(params.skip-checks)
