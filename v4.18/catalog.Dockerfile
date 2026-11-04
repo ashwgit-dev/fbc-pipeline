@@ -13,4 +13,4 @@ RUN ["/bin/opm", "serve", "/configs", "--cache-dir=/tmp/cache", "--cache-only"]
 # Set DC-specific label for the location of the DC root directory
 # in the image
 LABEL operators.operatorframework.io.index.configs.v1=/configs
-LABEL com.redhat.fbc.openshift.version='["v4.16","v4.17"]'
+LABEL com.redhat.fbc.openshift.version='["v4.17", "v4.18"]'
